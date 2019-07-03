@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 
 import rospy
-
-import roslib
-roslib.load_manifest('tf')
 import tf
+import roslib
+roslib.load_manifest('learning_tf')
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import Point
 from geometry_msgs.msg import Quaternion
@@ -16,7 +15,7 @@ import cv2.aruco as aruco
 from geometry_msgs.msg import Vector3
 
 
-with np.load('/home/tejas/crazyflie-lib-python/examples/tejas_codes/vision/pose_detection/cam_param_fpv.npz') as X:
+with np.load('/home/harrafa/crazyflie_ws/src/crazy_flie_ros/scripts/cam_param_fpv.npz') as X:
 	mtx, dist = [X[i] for i in ('mtx','dist')]
 cap = cv2.VideoCapture(0)
 marker_length = 87 # millimeters
@@ -27,15 +26,15 @@ def convert_rodrigues(x):
 	rot,_ = cv2.Rodrigues(x[0:3])
 	quat = tf3d.quaternions.mat2quat(rot[0:3,0:3])
 	eul = tf3d.euler.mat2euler(rot[0:3,0:3])
-	return eul 
+        return eul 
 
 
 def talker():
 	# pub1 = rospy.Publisher('chatter', String, queue_size=10)
 	pub2 = rospy.Publisher('aruco_pose', Vector3, queue_size=30)
-	br = tf.TransformBroadcaster()
+        br = tf.TransformBroadcaster()
 
-		  
+          
 
 	## reference https://matthew-brett.github.io/transforms3d/reference/transforms3d.euler.html#transforms3d.euler.mat2euler
 
@@ -79,26 +78,23 @@ def talker():
 				strg += str(ids[i][0])+', '
 
 			cv2.putText(frame, "Id: " + strg, (0,64), font, 1, (0,255,0),2,cv2.LINE_AA)
-			a = np.array([1,2,3])
-			rvec = a/np.linalg.norm(a) 
-			eul = convert_rodrigues (rvec)
+		        a = np.array([1,2,3])
+                        rvec = a/np.linalg.norm(a) 
+                        eul = convert_rodrigues (rvec)
 			aruco_pose = Vector3()
 			#aruco_pose.position = Point(x=tvec[0][0][0],y=tvec[0][0][1],z=tvec[0][0][2])
 			#aruco_pose.orientation = Quaternion(x=1,y=0,z=0,w=0)
 			#rospy.loginfo(aruco_pose)
-			aruco_pose.x= tvec[0][0][0]
-			aruco_pose.y= tvec[0][0][1]
-			aruco_pose.z= tvec[0][0][2]
+                        aruco_pose.x= tvec[0][0][0]
+                        aruco_pose.y= tvec[0][0][1]
+                        aruco_pose.z= tvec[0][0][2]
 			pub2.publish(aruco_pose) 
-			#br.sendTransform((tvec[0][0][0],tvec[0][0][1],tvec[0][0][2]),
-			#tf.transformations.quaternion_from_euler(0, 0, 0),
-			#rospy.Time.now(),
-			#camera,
-			#"world")
-			br.sendTransform((tvec[0][0][0],tvec[0][0][1],tvec[0][0][2]),
-			tf.transformations.quaternion_from_euler(*eul),
-			rospy.Time.now(),
-			camera, "world")
+                        #tf.transformations.quaternion_from_euler(0, 0, 0),
+                        br.sendTransform((-tvec[0][0][0],-tvec[0][0][1],-tvec[0][0][2]),
+                        tf.transformations.quaternion_from_euler(eul),
+                        rospy.Time.now(),
+                        "camera",
+                        "world")
 		else:
 			# code to show 'No Ids' when no markers are found
 			cv2.putText(frame, "No Ids", (0,64), font, 1, (0,255,0),2,cv2.LINE_AA)
