@@ -1,0 +1,4 @@
+<launch>        
+        <node pkg="crazy_flie_ros" type="talker1.py" name="talker1" output="screen"></node>
+
+</launch>

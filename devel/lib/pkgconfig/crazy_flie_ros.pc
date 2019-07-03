@@ -1,0 +1,8 @@
+prefix=/home/tejas/catkin_ws/devel
+
+Name: crazy_flie_ros
+Description: Description of crazy_flie_ros
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/tejas/catkin_ws/devel/lib 
+Requires: 
